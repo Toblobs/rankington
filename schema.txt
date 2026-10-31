@@ -1,0 +1,39 @@
+CREATE TABLE IF NOT EXISTS Metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+INSERT OR IGNORE INTO Metadata VALUES ('schema_version','1');
+CREATE TABLE IF NOT EXISTS Players(
+ player_id TEXT PRIMARY KEY, name TEXT NOT NULL, name_key TEXT UNIQUE NOT NULL,
+ joined_after_week TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS Weeks(
+ week TEXT PRIMARY KEY, digest TEXT NOT NULL, source_csv TEXT NOT NULL, k REAL NOT NULL CHECK(k>0),
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS Matches(
+ match_id TEXT PRIMARY KEY, week TEXT NOT NULL REFERENCES Weeks(week) ON DELETE CASCADE,
+ player1 TEXT NOT NULL REFERENCES Players(player_id),
+ player2 TEXT NOT NULL REFERENCES Players(player_id),
+ player3 TEXT NOT NULL REFERENCES Players(player_id),
+ player4 TEXT NOT NULL REFERENCES Players(player_id),
+ team1_score INTEGER NOT NULL CHECK(team1_score>=0),
+ team2_score INTEGER NOT NULL CHECK(team2_score>=0),
+ CHECK(player1<>player2 AND player1<>player3 AND player1<>player4
+ AND player2<>player3 AND player2<>player4 AND player3<>player4)
+);
+CREATE INDEX IF NOT EXISTS matches_week ON Matches(week);
+CREATE TABLE IF NOT EXISTS Ratings(
+ week TEXT NOT NULL REFERENCES Weeks(week) ON DELETE CASCADE,
+ player_id TEXT NOT NULL REFERENCES Players(player_id),
+ start_rating REAL NOT NULL, end_rating REAL NOT NULL, delta REAL NOT NULL,
+ games INTEGER NOT NULL, wins INTEGER NOT NULL, losses INTEGER NOT NULL,
+ points_for INTEGER NOT NULL, points_against INTEGER NOT NULL,
+ PRIMARY KEY(week,player_id)
+);
+CREATE TABLE IF NOT EXISTS MatchCalculations(
+ match_id TEXT PRIMARY KEY REFERENCES Matches(match_id) ON DELETE CASCADE,
+ team1_rating REAL NOT NULL, team2_rating REAL NOT NULL,
+ expected_team1 REAL NOT NULL, actual_team1 INTEGER NOT NULL,
+ delta_per_team1_player REAL NOT NULL,
+ raw_delta_per_team1_player REAL NOT NULL DEFAULT 0,
+ margin_multiplier REAL NOT NULL DEFAULT 1
+);
