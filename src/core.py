@@ -699,7 +699,7 @@ class Store:
         with self.connection() as db:
             
             return [dict(r) for r in db.execute(
-                "SELECT w.week,w.algorithm,w.k,w.created_at,w.updated_at,COUNT(m.match_id) AS matches "
+                "SELECT w.week,w.k,w.created_at,w.updated_at,COUNT(m.match_id) AS matches "
                 "FROM Weeks w LEFT JOIN Matches m USING(week) GROUP BY w.week ORDER BY w.week")]
             
     def leaderboard(self, week: Optional[str] = None):

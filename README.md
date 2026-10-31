@@ -48,7 +48,7 @@ $env:BADMINTON_ADMIN_KEY = "replace-with-a-long-random-secret"
 python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
 ```
 
-Replace the example API key before using the server. Once it is running, open [the interactive API documentation](http://127.0.0.1:8000/docs).
+Replace the example API key before using the server. Once it is running, open [the interactive FastAPI documentation](http://127.0.0.1:8000/docs).
 
 The server occupies the terminal while it is running. To use the CLI at the same time, open another terminal in the project root and activate the same virtual environment. The CLI can also run without the API server.
 
@@ -123,16 +123,7 @@ In a leaderboard response, `games`, `wins`, `losses`, `points_for`, and `points_
 
 Successful **CSV import** responses return `week`, `status`, and `ratings`. New imports, replacements, and previews also return `recalculated_weeks`. The import status can be `imported`, `replaced`, `preview`, or `already_imported`; an `already_imported` response omits `recalculated_weeks`.
 
-For a CSV preview, add `?preview=true` to the import URL. For model recalculation, send a JSON body such as:
-
-```json
-{
-  "algorithm": "doubles-average-batch-margin-elo-v2",
-  "preview": true
-}
-```
-
-Set `preview` to `false` to commit. Recalculation responses contain `status`, `algorithm`, and a `changes` list comparing old and new ratings.
+For a CSV preview, add `?preview=true` to the import URL. Set `preview` to `false` to commit. Recalculation responses contain `status` and a `changes` list comparing old and new ratings.
 
 ### CSV Format
 
@@ -177,7 +168,7 @@ For interactive charts on websites or in other applications, use the JSON rating
 | Table | Key | Stored information |
 |---|---|---|
 | `Players` | `player_id` | Permanent ID, display name, normalised unique name, eligibility boundary, and creation time |
-| `Weeks` | `week` | Monday date, semantic hash, latest source CSV, algorithm version, K, and timestamps |
+| `Weeks` | `week` | Monday date, semantic hash, latest source CSV, K, and timestamps |
 | `Matches` | `match_id` | Week, four player foreign keys, and both final scores |
 | `Ratings` | `week` + `player_id` | Opening rating, closing rating, change, games, wins, losses, points for, and points against |
 | `MatchCalculations` | `match_id` | Opening team averages, expected and actual Team 1 result, raw adjustment, margin multiplier, and final per-Team-1-player adjustment |
@@ -220,7 +211,7 @@ final_delta = M * raw_delta
 | `K` | Adjustment factor per player, per game |
 | `final_delta` | Rating contribution for each Team 1 player |
 
-`K = 32` is an initial design choice rather than a value calibrated to this group's results. Applying equal and opposite adjustments conserves the total rating across the four players.
+> `K = 32` is an arbitrarily chosen value.
 
 For example, suppose A is rated 1200, B is rated 800, and C and D are each rated 1100. The team averages are 1000 and 1100. This 100-point Elo difference gives Team 1 an expected win probability of approximately `0.359935`, or **35.99%**.
 
@@ -237,7 +228,7 @@ For the same score margin:
 - Losing alongside a strong partner against a weaker pair is more surprising and costs more.
 - Winning alongside a weaker partner against a stronger pair earns more.
 
-It might be tempting to award B a larger adjustment simply because B is lower rated than A. However, the final score provides no evidence that B contributed more to that particular victory. Unequal adjustments would introduce an additional assumption. Equal adjustments are consistent with both players having equal influence on their team's average rating.
+It might be tempting to award B a larger adjustment simply because B is lower rated than A. However, the final score provides no evidence that B contributed more to that particular victory. Unequal adjustments would introduce an additional assumption; therefore we use equal adjustments which are consistent with both players having equal influence on their team's average rating.
 
 There is currently no inactivity decay. Missing a week leaves a player's rating unchanged.
 
@@ -281,11 +272,15 @@ Rotate partners and opponents, and aim for reasonably similar game counts where 
 
 ## Credits and References
 
-- `@toblobs` — main engine design.
-- Project contributors:
+`@toblobs` for main engine design.
+
+Project contributors:
 
 [![Project contributors](https://contrib.rocks/image?repo=Toblobs/rankington)](https://github.com/Toblobs/rankington/graphs/contributors)
 
-- JetBrains Mono font.
+-----
+
+References
+- [JetBrains Mono font](https://fonts.google.com/specimen/JetBrains+Mono).
 - [Microsoft TrueSkill project](https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/).
 - [FiveThirtyEight on margin multipliers](https://fivethirtyeight.com/methodology/how-our-nfl-predictions-work/).
