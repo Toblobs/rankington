@@ -17,7 +17,7 @@ Jump to a section:
 
 ![Week 3 leaderboard](assets/week3-spreadsheet.png)
 
-> Last updated `31.10.26` by `@toblobs`.
+> Last updated `06.11.26` by `@toblobs`.
 
 ## Quick Start
 
@@ -90,6 +90,11 @@ python -m src.cli import 2026-10-19 corrected-week1.csv --replace
 The correction replaces that week's matches and rebuilds the derived ratings, including later weeks whose opening ratings are affected. Backup commands refuse to overwrite an existing destination, so use a new filename for each backup.
 
 ### API Use
+
+You can set up your own API for your own group.
+
+For my group, the current API is: https://rankington-api.toblobs.dev
+> Try: `curl.exe -i https://rankington-api.toblobs.dev/health` (Windows)
 
 The API routes are defined in `src/api.py`.
 

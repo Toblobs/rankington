@@ -38,7 +38,7 @@ class ScheduleInput(BaseModel):
 
 def create_app(db_path = None, admin_key = None):
     
-    path = db_path or "data/badminton.sqlite3"
+    path = db_path or os.environ.get("BADMINTON_DB") or "data/badminton.sqlite3"
     key = admin_key if admin_key is not None else os.getenv("BADMINTON_ADMIN_KEY", "")
     
     @asynccontextmanager
