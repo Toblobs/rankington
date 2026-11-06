@@ -15,7 +15,7 @@ Jump to a section:
 
 ## Current Spreadsheet Image
 
-![Week 2 leaderboard](assets/week2-spreadsheet.png)
+![Week 3 leaderboard](assets/week3-spreadsheet.png)
 
 > Last updated `31.10.26` by `@toblobs`.
 
